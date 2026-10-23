@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply bg-fondo text-texto antialiased;
+    font-feature-settings: 'kern', 'liga';
+  }
+
+  /* Foco siempre visible para quien navega con teclado. */
+  :focus-visible {
+    @apply outline-none ring-2 ring-accion ring-offset-2 ring-offset-fondo;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply text-tinta;
+    text-wrap: balance;
+  }
+
+  code,
+  pre {
+    @apply font-mono;
+  }
+}
+
+@layer components {
+  .boton {
+    @apply inline-flex items-center justify-center gap-2 rounded-md bg-accion px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-accion-oscuro disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .boton-secundario {
+    @apply inline-flex items-center justify-center gap-2 rounded-md border border-linea bg-white px-4 py-2.5 text-sm font-semibold text-tinta transition-colors hover:border-tinta;
+  }
+
+  .enlace {
+    @apply font-medium text-accion underline decoration-accion/30 underline-offset-4 hover:decoration-accion;
+  }
+
+  .campo {
+    @apply block w-full rounded-md border border-linea bg-white px-3 py-2.5 text-base text-texto placeholder:text-texto-suave/70 focus:border-accion;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

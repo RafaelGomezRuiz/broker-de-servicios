@@ -1,0 +1,36 @@
+# Broker de Servicios — CI
+#
+# Mismo esquema que SGRH: pool k8s, variable group cicd-noprod y build en ACR.
+# Las imágenes base (php:8.3-cli / php:8.3-fpm) se toman de nuestro ACR
+# con BASE_REGISTRY para no depender del rate limit de Docker Hub.
+#
+# PENDIENTE (Fase 7): stage Deploy que actualiza el tag en el repo infra
+# (clusters/noprod/broker/broker.yaml), igual que hace SGRH. Se agrega
+# cuando ese manifiesto exista; antes, el sed no tendría qué actualizar.
+trigger:
+  branches: { include: [ main ] }
+  paths: { include: [ broker-api/*, broker-spa/* ] }
+pr: none
+variables:
+  - group: cicd-noprod
+  - name: TAG
+    value: 'v$(Build.BuildId)-dev'
+stages:
+- stage: Build
+  jobs:
+  - job: build
+    pool: { name: k8s }
+    steps:
+    - checkout: self
+      fetchDepth: 1
+    - task: AzureCLI@2
+      inputs:
+        azureSubscription: 'azure-acr-minc'
+        scriptType: bash
+        scriptLocation: inlineScript
+        inlineScript: |
+          set -e
+          az acr build -r $(ACR_NAME) -t broker-api:$(TAG) -t broker-api:latest --build-arg BASE_REGISTRY=$(ACR_NAME).azurecr.io/ ./broker-api
+          # broker-spa: una sola imagen para todos los ambientes; la URL del API llega
+          # del ConfigMap en runtime (docker/entrypoint.sh), nunca como build-arg.
+          az acr build -r $(ACR_NAME) -t broker-spa:$(TAG) -t broker-spa:latest ./broker-spa

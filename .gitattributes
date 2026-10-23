@@ -1,0 +1,8 @@
+# Finales de línea LF en todo el repositorio: los scripts corren en
+# contenedores Linux y un CRLF rompe docker/start.sh y entrypoint.sh.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.ico binary
+*.pdf binary
